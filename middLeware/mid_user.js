@@ -1,12 +1,22 @@
 //const rateLimit = require('express-rate-limit');
+const {saveUserAgent, saveBlockedUser} = require('../utils/uti_logger.js');
 
 const checkUserAgent = (req, res, next) => {
     const userAgent = req.headers['user-agent'];
 
+    
     console.log(userAgent);
-    if (!userAgent || isBlockedUserAgent(userAgent)) {
+
+    if(!userAgent) {
+
         return res.status(400).json({ message: 'baba tomar abastha sandehajanaka' });
     }
+
+    else if (isBlockedUserAgent(userAgent)) {
+        saveBlockedUser(userAgent)
+        return res.status(400).json({ message: 'baba tomar abastha sandehajanaka' });
+    }
+    saveUserAgent(userAgent);
     next();
 }
 
