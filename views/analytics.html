@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>User-Agent Analytics</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { font-family: sans-serif; text-align: center; padding: 20px; }
+    canvas { max-width: 600px; margin: 20px auto; }
+  </style>
+</head>
+<body>
+  <h2>User-Agent Analytics</h2>
+
+  <!-- Date Filters -->
+  <div>
+    <label for="startDate">Start Date:</label>
+    <input type="date" id="startDate" />
+    <label for="endDate">End Date:</label>
+    <input type="date" id="endDate" />
+    <button onclick="loadData()">Filter</button>
+    <button onclick="downloadCSV()">Download CSV</button>
+  </div>
+
+  <!-- Chart Container -->
+  <canvas id="analyticsChart" width="600" height="300"></canvas>
+
+  <script>
+    let chart; // Global chart instance
+
+    async function loadData() {
+      const start = document.getElementById('startDate').value;
+      const end = document.getElementById('endDate').value;
+
+      let url = '/ap/user-agents';
+      const params = new URLSearchParams();
+      if (start) params.append('startDate', start);
+      if (end) params.append('endDate', end);
+
+      if (params.toString()) url += `?${params.toString()}`;
+
+      const res = await fetch(url);
+      const data = await res.json();
+
+      renderChart(data);
+    }
+
+    function renderChart(data) {
+      const labels = Object.keys(data);
+      const counts = Object.values(data);
+
+      const ctx = document.getElementById('analyticsChart').getContext('2d');
+
+      if (chart) {
+        chart.destroy();
+      }
+
+      chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'User-Agent Count',
+            data: counts,
+            backgroundColor: 'rgba(75, 192, 192, 0.6)',
+            borderColor: 'rgba(75, 192, 192, 1)',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          scales: {
+            y: { beginAtZero: true }
+          }
+        }
+      });
+    }
+
+    function downloadCSV() {
+      window.location.href = '/ap/download';
+    }
+
+    // Load default chart on page load
+    loadData();
+  </script>
+</body>
+</html>
