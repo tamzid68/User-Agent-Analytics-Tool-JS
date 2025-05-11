@@ -1,87 +1,112 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>User-Agent Analytics</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <style>
-    body { font-family: sans-serif; text-align: center; padding: 20px; }
-    canvas { max-width: 600px; margin: 20px auto; }
-  </style>
-</head>
-<body>
-  <h2>User-Agent Analytics</h2>
-
-  <!-- Date Filters -->
-  <div>
-    <label for="startDate">Start Date:</label>
-    <input type="date" id="startDate" />
-    <label for="endDate">End Date:</label>
-    <input type="date" id="endDate" />
-    <button onclick="loadData()">Filter</button>
-    <button onclick="downloadCSV()">Download CSV</button>
-  </div>
-
-  <!-- Chart Container -->
-  <canvas id="analyticsChart" width="600" height="300"></canvas>
-
-  <script>
-    let chart; // Global chart instance
-
-    async function loadData() {
-      const start = document.getElementById('startDate').value;
-      const end = document.getElementById('endDate').value;
-
-      let url = '/ap/user-agents';
-      const params = new URLSearchParams();
-      if (start) params.append('startDate', start);
-      if (end) params.append('endDate', end);
-
-      if (params.toString()) url += `?${params.toString()}`;
-
-      const res = await fetch(url);
-      const data = await res.json();
-
-      renderChart(data);
-    }
-
-    function renderChart(data) {
-      const labels = Object.keys(data);
-      const counts = Object.values(data);
-
-      const ctx = document.getElementById('analyticsChart').getContext('2d');
-
-      if (chart) {
-        chart.destroy();
-      }
-
-      chart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: labels,
-          datasets: [{
-            label: 'User-Agent Count',
-            data: counts,
-            backgroundColor: 'rgba(75, 192, 192, 0.6)',
-            borderColor: 'rgba(75, 192, 192, 1)',
-            borderWidth: 1
-          }]
-        },
-        options: {
-          scales: {
-            y: { beginAtZero: true }
-          }
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>User-Agent Analytics</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+            background-color: #f9f9f9;
         }
-      });
-    }
 
-    function downloadCSV() {
-      window.location.href = '/ap/download';
-    }
+        h2 {
+            margin-bottom: 20px;
+        }
 
-    // Load default chart on page load
-    loadData();
-  </script>
+        .controls {
+            margin-bottom: 20px;
+        }
+
+        canvas {
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            padding: 10px;
+        }
+
+        button {
+            padding: 6px 12px;
+            margin-left: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007BFF;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+
+<body>
+    <h2>User-Agent Analytics</h2>
+
+    <div class="controls">
+        <button onclick="downloadCSV()">Download CSV</button>
+    </div>
+
+    <canvas id="analyticsChart" width="600" height="300"></canvas>
+
+    <script>
+        async function loadChart() {
+            try {
+                const res = await fetch('/ap/user-agent')
+                    .then(res => res.json())
+                    .then(data => {
+                        console.log(data); // <-- ADD THIS LINE
+                        // your chart drawing code
+                    });
+                const data = await res.json();
+
+                const labels = Object.keys(data);
+                const values = Object.values(data);
+
+                const ctx = document.getElementById('analyticsChart').getContext('2d');
+
+                // Destroy existing chart instance
+                if (window.analyticsChart) {
+                    window.analyticsChart.destroy();
+                }
+
+                window.analyticsChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'User-Agent Count',
+                            data: values,
+                            backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            } catch (err) {
+                console.error('Chart load error:', err);
+            }
+        }
+
+        function downloadCSV() {
+            window.location.href = '/ap/download';
+        }
+
+        window.onload = loadChart;
+    </script>
 </body>
+
 </html>
