@@ -16,7 +16,7 @@ const checkUserAgent = (req, res, next) => {
         saveBlockedUser(userAgent)
         return res.status(400).json({ message: 'baba tomar abastha sandehajanaka' });
     }
-    saveUserAgent(userAgent);
+    //saveUserAgent(userAgent);
     next();
 }
 
