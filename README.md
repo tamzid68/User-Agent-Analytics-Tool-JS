@@ -106,10 +106,8 @@ User-Agent-Analytics-Tool/
 ## Screenshots
 
 ### Analytics Page
-![Analytics Page](https://via.placeholder.com/800x400?text=Analytics+Page)
+![image](https://github.com/user-attachments/assets/08927592-a0c0-49d2-8af6-ad7d39efc68e)
 
-### CSV Download
-![CSV Download](https://via.placeholder.com/800x400?text=CSV+Download)
 
 ## License
 
