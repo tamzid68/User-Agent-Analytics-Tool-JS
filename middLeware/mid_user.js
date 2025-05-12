@@ -1,13 +1,19 @@
 //const rateLimit = require('express-rate-limit');
-const {saveUserAgent, saveBlockedUser} = require('../utils/uti_logger.js');
+const { saveUserAgent, saveBlockedUser } = require('../utils/uti_logger.js');
+//const logUserAgent = require('../middLeware/logUserAgent.js');
+//const express = require('express');
+//const app = express();
 
 const checkUserAgent = (req, res, next) => {
     const userAgent = req.headers['user-agent'];
+    const logEntry = {
+        userAgent,
+        timestamp: new Date().toISOString(),
+    };
 
-    
-    console.log(userAgent);
+    //console.log(userAgent);
 
-    if(!userAgent) {
+    if (!userAgent) {
 
         return res.status(400).json({ message: 'baba tomar abastha sandehajanaka' });
     }
@@ -16,10 +22,13 @@ const checkUserAgent = (req, res, next) => {
         saveBlockedUser(userAgent)
         return res.status(400).json({ message: 'baba tomar abastha sandehajanaka' });
     }
-    //saveUserAgent(userAgent);
+    // Log the user agent
+    saveUserAgent(logEntry);
+    //app.use(logUserAgent);
     next();
 }
 
+// Middleware to check for blocked user agents
 const blockedPatterns = [
     /curl/i,
     /wget/i,

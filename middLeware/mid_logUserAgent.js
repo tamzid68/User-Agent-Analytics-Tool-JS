@@ -1,3 +1,5 @@
+//This middleware not useing right now
+/*
 const fs = require('fs');
 const path = require('path');
 
@@ -33,3 +35,4 @@ const logUserAgent = (req, res, next)=>{
 };
 
 module.exports = logUserAgent;
+*/

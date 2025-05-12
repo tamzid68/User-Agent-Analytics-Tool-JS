@@ -4,6 +4,7 @@ const path = require('path');
 const userAgentFile = path.join(__dirname, '../userAgent.json');
 const blockedUserAgent = path.join(__dirname,'../blockedUser.json');
 
+// Function to save user agent
 const saveUserAgent = (agentString) => {
     let data = [];
 
@@ -16,6 +17,7 @@ const saveUserAgent = (agentString) => {
     fs.writeFileSync(userAgentFile, JSON.stringify(data, null, 2));
 };
 
+// Function to save blocked user agent
 const saveBlockedUser=(userAgent) => {
     let data = [];
 

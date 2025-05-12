@@ -55,46 +55,92 @@
     <canvas id="analyticsChart" width="600" height="300"></canvas>
 
     <script>
+        //console.log('Script loaded'); // Debugging: Check if script is loaded
+
         async function loadChart() {
+            //console.log('loadChart() called'); // Debugging: Check if function is called
             try {
-                const res = await fetch('/ap/user-agent')
-                    .then(res => res.json())
-                    .then(data => {
-                        console.log(data); // <-- ADD THIS LINE
-                        // your chart drawing code
-                    });
+                const res = await fetch('/api/user-agent');//link to the backend API
+                //console.log('Response from backend:', res);
+                if (!res.ok) {
+                    throw new Error(`HTTP error! status: ${res.status}`);
+                }
                 const data = await res.json();
+                //console.log('Data received from backend:', data);
 
                 const labels = Object.keys(data);
                 const values = Object.values(data);
 
+                //console.log('Labels:', labels);
+                //console.log('Values:', values);
+
                 const ctx = document.getElementById('analyticsChart').getContext('2d');
 
-                // Destroy existing chart instance
-                if (window.analyticsChart) {
+                // Destroy the previous chart instance if it exists
+                if (window.analyticsChart && typeof window.analyticsChart.destroy === 'function') {
                     window.analyticsChart.destroy();
                 }
 
+                // Create a new chart instance
                 window.analyticsChart = new Chart(ctx, {
                     type: 'bar',
                     data: {
                         labels: labels,
-                        datasets: [{
-                            label: 'User-Agent Count',
-                            data: values,
-                            backgroundColor: 'rgba(75, 192, 192, 0.6)',
-                            borderColor: 'rgba(75, 192, 192, 1)',
-                            borderWidth: 1
-                        }]
+                        datasets: [
+                            {
+                                label: 'User-Agent Count',
+                                data: values,
+                                backgroundColor: [
+                                    'rgba(75, 192, 192, 0.6)', // Postman
+                                    'rgba(54, 162, 235, 0.6)', // Thunder Client
+                                    'rgba(255, 206, 86, 0.6)', // Chrome Browser
+                                    'rgba(153, 102, 255, 0.6)', // Edge Browser
+                                    'rgba(255, 159, 64, 0.6)', // Other
+                                    'rgba(255, 99, 132, 0.6)', // Blocked
+                                ],
+                                borderColor: [
+                                    'rgba(75, 192, 192, 1)',
+                                    'rgba(54, 162, 235, 1)',
+                                    'rgba(255, 206, 86, 1)',
+                                    'rgba(153, 102, 255, 1)',
+                                    'rgba(255, 159, 64, 1)',
+                                    'rgba(255, 99, 132, 1)',
+                                ],
+                                borderWidth: 1,
+                            },
+                        ],
                     },
                     options: {
                         responsive: true,
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'top',
+                            },
+                            title: {
+                                display: true,
+                                text: 'User-Agent Analytics',
+                                font: {
+                                    size: 18,
+                                },
+                            },
+                        },
                         scales: {
                             y: {
-                                beginAtZero: true
-                            }
-                        }
-                    }
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Number of Requests',
+                                },
+                            },
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'User Agent Types',
+                                },
+                            },
+                        },
+                    },
                 });
             } catch (err) {
                 console.error('Chart load error:', err);
@@ -102,10 +148,11 @@
         }
 
         function downloadCSV() {
-            window.location.href = '/ap/download';
+            window.location.href = '/api/download';//link to the backend API for CSV download
         }
 
-        window.onload = loadChart;
+        // Call loadChart on page load
+        document.addEventListener('DOMContentLoaded', loadChart);
     </script>
 </body>
 

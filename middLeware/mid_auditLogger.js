@@ -1,5 +1,6 @@
 const saveAuditLog = require('../utils/uti_auditFile'); // Assuming you have a function to save logs
 
+// Middleware to log audit information
 const auditLogger = (req, res, next) => {
     const logEntry = {
         method: req.method,
